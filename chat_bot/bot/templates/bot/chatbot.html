@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot - Llama Bot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+        .chat-container {
+            max-width: 600px;
+            margin: 50px auto;
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .chat-box {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-bottom: 10px;
+            padding-right: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        .chat-message {
+            margin-bottom: 15px;
+        }
+        .chat-message .user {
+            color: #2C3E50;
+            font-weight: bold;
+        }
+        .chat-message .bot {
+            color: #8E44AD;
+        }
+        .input-box {
+            display: flex;
+        }
+        .input-box input {
+            width: 85%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            font-size: 16px;
+        }
+        .input-box button {
+            width: 15%;
+            padding: 10px;
+            background-color: #8E44AD;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .input-box button:hover {
+            background-color: #9B59B6;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="chat-container">
+        <h2>Chatbot - Llama Bot</h2>
+        <div class="chat-box" id="chat-box">
+            <!-- El historial de mensajes se añadirá aquí -->
+        </div>
+        <div class="input-box">
+            <input type="text" id="user-input" placeholder="Escribe un mensaje..." />
+            <button onclick="sendMessage()">Enviar</button>
+        </div>
+    </div>
+
+    <script>
+        const chatBox = document.getElementById("chat-box");
+        const userInput = document.getElementById("user-input");
+
+        // Función para agregar un mensaje al chat
+        function addMessage(message, sender) {
+            const messageDiv = document.createElement("div");
+            messageDiv.classList.add("chat-message");
+
+            const senderClass = sender === "user" ? "user" : "bot";
+            messageDiv.innerHTML = `<span class="${senderClass}">${sender === "user" ? "Tú" : "Llama Bot"}:</span> ${message}`;
+            
+            chatBox.appendChild(messageDiv);
+            chatBox.scrollTop = chatBox.scrollHeight; // Desplazar hacia abajo automáticamente
+        }
+
+        // Función para enviar el mensaje
+        function sendMessage() {
+            const message = userInput.value.trim();
+            if (message === "") return; // No enviar mensaje vacío
+
+            // Mostrar el mensaje del usuario en el chat
+            addMessage(message, "user");
+
+            // Limpiar el campo de entrada
+            userInput.value = "";
+
+            // Llamada a la API del chatbot
+            fetch(`/bot/ask/?message=${encodeURIComponent(message)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.response) {
+                        // Mostrar la respuesta del bot
+                        addMessage(data.response, "bot");
+                    } else {
+                        addMessage("Lo siento, algo salió mal.", "bot");
+                    }
+                })
+                .catch(error => {
+                    addMessage("Hubo un error al conectarse al servidor.", "bot");
+                });
+        }
+
+        // Permitir enviar el mensaje al presionar Enter
+        userInput.addEventListener("keypress", function (e) {
+            if (e.key === "Enter") {
+                sendMessage();
+            }
+        });
+    </script>
+
+</body>
+</html>
