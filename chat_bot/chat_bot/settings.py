@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'bot',
 ]
 
-HUGGINGFACE_API_KEY = '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'
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
